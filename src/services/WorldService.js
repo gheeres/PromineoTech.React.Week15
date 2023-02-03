@@ -30,13 +30,12 @@ export default class WorldService {
     return fetch(url).then(res => res.json())
                      .then((json) => {
                        return json.map(c => {
-                        //return {
-                        //  country_code: c.country.country_code,
-                        //  country_name: c.country.country_name,
-                        //  is_official: c.is_official,
-                        //  language_percentage: c.language_percentage
-                        //};
-                        return c;
+                        return {
+                          country_code: c.country.country_code,
+                          country_name: c.country.country_name,
+                          is_official: c.is_official,
+                          language_percentage: c.language_percentage
+                        };
                        });
                      });
   }
