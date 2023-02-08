@@ -21,10 +21,10 @@ export default function CountryLanguageModal(props) {
     modal.show();
   }, [])
   useEffect(() => {
-    service.getLangageDetailForCountry(country, language).then((detail) => {
+    service.getLangageDetailForCountry(props.country, props.language).then((detail) => {
       setDetail(detail);
     });
-  }, [ country, language ])
+  }, [ props.country, props.language ])
 
   function handleClose(e) {
     modal.hide();
@@ -99,10 +99,10 @@ export default function CountryLanguageModal(props) {
                 </div>
                 <div className="mb-3">
                   <label htmlFor="language_percentage" className="form-label">Percentage:</label>
-                  <input type="number" className="form-control" min="0" max="100" step="0.1" id="language_percentage" value={ detail?.language_percentage } />
+                  <input type="number" className="form-control" min="0" max="100" step="0.1" id="language_percentage" defaultValue={ detail?.language_percentage } />
                 </div>
                 <div className="mb-3 form-check">
-                  <input id="is_official" type="checkbox" className="form-check-input" defaultChecked={ (detail?.is_official || false) } />
+                  <input id="is_official" type="checkbox" className="form-check-input" defaultChecked={ detail?.is_official } />
                   <label className="form-check-label" htmlFor="is_official">Is Official</label>
                 </div>
               </div>

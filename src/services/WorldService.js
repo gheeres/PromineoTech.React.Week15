@@ -86,7 +86,14 @@ export default class WorldService {
     console.log(`Requesting data from: ${ url }...`);
     return fetch(url).then(res => res.json())
                      .then((json) => {
-                       return json;
+                      return json.map(c => {
+                        return {
+                          //country_code: country,
+                          language_code: c.language.language_code,
+                          is_official: c.is_official,
+                          language_percentage: c.language_percentage
+                        };
+                       });
                      });
   }
 
@@ -97,9 +104,11 @@ export default class WorldService {
    * @returns {CountryLanguageDetail} The language details for the country / language.
    */
   async getLangageDetailForCountry(country, language) {
-    return this.getLanguagesSpokenInCountry(country).then((details) => {
-                                                            return details.find((d) => d.language_code === language);
-                                                          });
+    if (country) {
+      return this.getLanguagesSpokenInCountry(country).then((details) => {
+        return details.find((d) => d.language_code === language);
+      });
+    }
   }
 
   /**
