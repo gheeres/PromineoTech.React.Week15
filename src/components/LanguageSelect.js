@@ -1,37 +1,37 @@
 import { useEffect, useState } from "react";
 import WorldService from "../services/WorldService";
 
-const service = new WorldService();
 const TAG = 'LanguageSelect';
+const service = new WorldService();
 
 export default function LanguageSelect(props) {
+  let language = props.language;
   const [ languages, setLanguages ] = useState(props.languages || []);
 
   useEffect(() => {
-    service.getLanguages().then((result) => {
-      setLanguages(result);
+    service.getLanguages().then((languages) => {
+      setLanguages(languages);
     });
   }, []);
 
-  function handleChange(e) {
-    console.log(`${ TAG }.handleChange(${ e.target.value })`);
+  function handleOnChange(e) {
     const language = e.target.value;
+    console.log(`${ TAG }.handleOnChange(${ language })`);
     if (props.onLanguageChange) {
       props.onLanguageChange(language);
     }
   }
 
   const options = languages.map((language) => {
-    return <option key={ language.language_code } 
-                   value={ language.language_code }>
+    return <option key={ language.language_code } value={ language.language_code }>
              { language.language_name }
-           </option>
-
+           </option>;
   });
 
   return (
-    <select className="form-select mt-2" onChange={ handleChange }>
-      <option value="">Select Language</option>
+    <select id={ props.id }className="form-select mt-2" aria-label="Select language" 
+            onChange={ handleOnChange } value={ language }>
+      <option value="">Select language</option>
       { options }
     </select>
   );

@@ -1,27 +1,36 @@
-import { useState, useEffect } from "react";
-import WorldService from "../services/WorldService";
+import { useState } from "react";
+import AddCountryLanguageModal from "./AddCountryLanguageModal";
 
 const TAG = 'CountryLanguageTable';
-const service = new WorldService();
 
 export default function CountryLanguageTable(props) {
-  console.log(`${ TAG }.render(${ JSON.stringify(props) })`);
-  const [ countries, setCountries ] = useState(props.countries || []);
+  let language = props.language;
+  let countries = props.countries || [];
+  let [ modal, setModal ] = useState(false);
 
-  useEffect(() => {
-    service.getCountriesThatSpeakLanguage(props.language).then((countries) => {
-      setCountries(countries);
-    });
-  }, [ props.language ]);
-
-  function handleOnDelete() {
+  function handleModalClose(e) {
+    setModal(false);
   }
 
-  function handleOnEdit() {
+  function handleOnEdit(e) {
+    const country = e.target.dataset.countryCode;
+    console.log(`${ TAG }.handleOnEdit(${ country })`);
+  }
+
+  function handleOnAdd(e) {
+   console.log(`${ TAG }.handleOnAdd(${ e })`);
+   setModal(true);
+  }
+
+  function handleOnDelete(e) {
+    const country = e.target.dataset.countryCode;
+    console.log(`${ TAG }.handleOnDelete(${ country })`);
+    if (props.onDelete) {
+      props.onDelete(country)
+    }
   }
 
   const rows = countries.map((country) => {
-    console.log(country);
     return (
       <tr key={ country.country_code } data-country-code={ country.country_code }>
         <td>{ country.country_code }</td>
@@ -37,20 +46,25 @@ export default function CountryLanguageTable(props) {
   });
 
   return(
-    <table className={ `table table-striped table-hover${ (! countries.length) ? ' d-none' : '' }` }>
-     <caption>{ (countries.length) ? countries.length : 'No' } countries</caption>
-     <thead>
-       <tr>
-         <th className="col-2">Code</th>
-         <th className="col-5">Country</th>
-         <th className="text-center col-1">Official?</th>
-         <th className="text-end col-2">Percentage</th>
-         <th className="text-end col-1"></th>
-       </tr>
-     </thead>
-     <tbody>
-       { rows }
-     </tbody>
-    </table>
+    <>
+      <table className={ `table table-striped table-hover${ (! countries.length) ? ' d-none' : '' }` }>
+       <caption>{ (countries.length) ? countries.length : 'No' } countries</caption>
+       <thead>
+         <tr>
+           <th className="col-2">Code</th>
+           <th className="col-5">Country</th>
+           <th className="text-center col-1">Official?</th>
+           <th className="text-end col-2">Percentage</th>
+           <th className="text-end col-1">
+             <i className="bi bi-plus-circle-fill fs-4 text-success" onClick={ handleOnAdd }></i>
+           </th>
+         </tr>
+       </thead>
+       <tbody>
+         { rows }
+       </tbody>
+      </table>
+      { modal ? <AddCountryLanguageModal language={ language } onClose={ handleModalClose } /> : '' }
+    </>
   );
 }
