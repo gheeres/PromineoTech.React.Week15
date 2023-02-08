@@ -6,6 +6,7 @@ const service = new WorldService();
 
 export default function CountrySelect(props) {
   let country = props.country;
+  let disabled = props.disabled || false;
   let [ countries, setCountries ] = useState(props.countries || []);
 
   useEffect(() => {
@@ -17,8 +18,8 @@ export default function CountrySelect(props) {
   function handleOnChange(e) {
     const country = e.target.value;
     console.log(`${ TAG }.handleOnChange(${ country })`);
-    if (props.onCountryChange) {
-      props.onCountryChange(country)
+    if (props.onChange) {
+      props.onChange(country, e)
     }
   }
 
@@ -29,7 +30,7 @@ export default function CountrySelect(props) {
   });
 
   return (
-    <select id={ props.id } className="form-select mt-2" aria-label="Select country" 
+    <select id={ props.id } className="form-select mt-2" disabled={ disabled } aria-label="Select country" 
             onChange={ handleOnChange } value={ country }>
       <option value="">Select country...</option>
       { options }

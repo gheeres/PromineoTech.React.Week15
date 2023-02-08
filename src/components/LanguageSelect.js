@@ -6,6 +6,7 @@ const service = new WorldService();
 
 export default function LanguageSelect(props) {
   let language = props.language;
+  let disabled = props.disabled || false;
   const [ languages, setLanguages ] = useState(props.languages || []);
 
   useEffect(() => {
@@ -17,8 +18,8 @@ export default function LanguageSelect(props) {
   function handleOnChange(e) {
     const language = e.target.value;
     console.log(`${ TAG }.handleOnChange(${ language })`);
-    if (props.onLanguageChange) {
-      props.onLanguageChange(language);
+    if (props.onChange) {
+      props.onChange(language, e);
     }
   }
 
@@ -29,7 +30,7 @@ export default function LanguageSelect(props) {
   });
 
   return (
-    <select id={ props.id }className="form-select mt-2" aria-label="Select language" 
+    <select id={ props.id } className="form-select mt-2$" disabled={ disabled } aria-label="Select language" 
             onChange={ handleOnChange } value={ language }>
       <option value="">Select language</option>
       { options }
