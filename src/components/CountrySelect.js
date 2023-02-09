@@ -5,15 +5,16 @@ const TAG = 'CountrySelect';
 const service = new WorldService();
 
 export default function CountrySelect(props) {
-  let country = props.country;
-  let disabled = props.disabled || false;
+  const country = props.country;
+  const disabled = props.disabled || false;
   let [ countries, setCountries ] = useState(props.countries || []);
 
   useEffect(() => {
+    const exclude = props.exclude || [];
     service.getCountries().then((countries) => {
-      setCountries(countries);
+      setCountries(countries.filter((c) => (c.country_code === country) || (! exclude.includes(c.country_code))));
     });
-  }, []);
+  }, [ props.exclude, country ]);
   
   function handleOnChange(e) {
     const country = e.target.value;

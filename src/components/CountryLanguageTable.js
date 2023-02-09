@@ -1,66 +1,46 @@
-import { useState } from "react";
-import CountryLanguageModal from "./CountryLanguageModal";
+import WorldService from "../services/WorldService";
 
 const TAG = 'CountryLanguageTable';
+const service = new WorldService();
 
 export default function CountryLanguageTable(props) {
-  let language = props.language;
-  let countries = props.countries || [];
-  let [ modal, setModal ] = useState(false);
+  const language = props.language;
+  const countries = props.countries || [];
 
-  function handleModalClose(e) {
-    setModal(false);
-  }
-
-  function displayAddModal(e) {
-    console.log(`${ TAG }.displayAddModal(${ e })`);
-    setModal('add');
-  }
-  function displayEditModal(e) {
-    const country = e.target.dataset.countryCode;
-    console.log(`${ TAG }.displayEditModal(${ country })`);
-    setModal(country);
+  function handleOnAdd(e) {
+    console.log(`${ TAG }.handleOnAdd(${ language })`);
+    if ((language) && (props.onAdd)) {
+      props.onAdd(language, countries, e);
+    }
   }
 
   function handleOnDelete(e) {
     const country = e.target.dataset.countryCode;
-    console.log(`${ TAG }.handleOnDelete(${ country })`);
-    if (props.onDelete) {
-      props.onDelete(country)
+    if ((country) && (props.onDelete)) {
+      console.log(`${ TAG }.handleOnDelete(${ country })`);
+      props.onDelete(country, e);
     }
   }
 
-  function handleOnAdd(response, e) {
-    //console.log(`${ TAG }.handleOnAdd(${ JSON.stringify(response) },${ e })`);
-    if (props.onAdd) {
-      props.onAdd(response, e);
-    }
-  }
-
-  function handleOnEdit(response, e) {
-    //console.log(`${ TAG }.handleOnEdit(${ JSON.stringify(response) }, ${ e })`);
-    if (props.onEdit) {
-      props.onEdit(response, e);
+  function handleOnEdit(e) {
+    const country = e.target.dataset.countryCode;
+    if ((country) && (props.onEdit)) {
+      console.log(`${ TAG }.handleOnEdit(${ country })`);
+      service.getLangageDetailForCountry(country, language).then((detail) => {
+        props.onEdit(country, detail, e);
+      });
     }
   }
 
   const rows = countries.map((country) => {
     return (
       <tr key={ country.country_code } data-country-code={ country.country_code }>
-        <td>
-          { country.country_code }
-          { (modal === country.country_code) 
-              ? <CountryLanguageModal language={ language } country={ country.country_code } 
-                                      title={ `Edit Detail` } 
-                                      onSave={ handleOnEdit }
-                                      onClose={ handleModalClose } /> 
-              : '' }
-        </td>
+        <td>{ country.country_code }</td>
         <td>{ country.country_name }</td>
         <td className="text-center">{ country.is_official ? <i className="bi bi-check-circle-fill"></i> : '' }</td>
         <td className="text-end">{ country.language_percentage.toFixed(1) || '' }%</td>
         <td className="text-end">
-          <i data-country-code={ country.country_code } className="text-primary bi bi-pencil-square" onClick={ displayEditModal }></i>
+          <i data-country-code={ country.country_code } className="text-primary bi bi-pencil-square" onClick={ handleOnEdit }></i>
           <i data-country-code={ country.country_code } className="text-danger bi bi-trash" onClick={ handleOnDelete }></i>
         </td>        
       </tr>
@@ -69,11 +49,6 @@ export default function CountryLanguageTable(props) {
 
   return(
     <>
-      { modal === 'add' 
-        ? <CountryLanguageModal language={ language } 
-                                onSave={ handleOnAdd }
-                                onClose={ handleModalClose } /> 
-        : '' }
       <table className={ `table table-striped table-hover${ (! countries.length) ? ' d-none' : '' }` }>
        <caption>{ (countries.length) ? countries.length : 'No' } countries</caption>
        <thead>
@@ -83,7 +58,7 @@ export default function CountryLanguageTable(props) {
            <th className="text-center col-1">Official?</th>
            <th className="text-end col-2">Percentage</th>
            <th className="text-end col-1">
-             <i className="bi bi-plus-circle-fill fs-4 text-success" onClick={ displayAddModal }></i>
+             <i className="bi bi-plus-circle-fill fs-4 text-success" onClick={ handleOnAdd }></i>
            </th>
          </tr>
        </thead>

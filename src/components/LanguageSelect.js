@@ -5,15 +5,16 @@ const TAG = 'LanguageSelect';
 const service = new WorldService();
 
 export default function LanguageSelect(props) {
-  let language = props.language;
-  let disabled = props.disabled || false;
+  const language = props.language;
+  const disabled = props.disabled || false;
   const [ languages, setLanguages ] = useState(props.languages || []);
 
   useEffect(() => {
+    const exclude = props.exclude || [];
     service.getLanguages().then((languages) => {
-      setLanguages(languages);
+      setLanguages(languages.filter((l) => (l.language_code === language) || (! exclude.includes(l.language_code))));
     });
-  }, []);
+  }, [ props.exclude, language ]);
 
   function handleOnChange(e) {
     const language = e.target.value;

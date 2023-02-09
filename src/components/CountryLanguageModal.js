@@ -8,10 +8,12 @@ const TAG = 'CountryLanguageModal';
 const service = new WorldService();
 
 export default function CountryLanguageModal(props) {
+  const countries = props.countries || [];
+  const languages = props.languages || [];
+  const [ existing, setExisting ] = useState({});
   const [ country, setCountry ] = useState(props.country);
   const [ language, setLanguage ] = useState(props.language);
-  const [ detail, setDetail ] = useState({});
-  const [ modal, setModal ] = useState(null);
+  const [ modal, setModal ] = useState(false);
   const modalRef = useRef(); 
   const title = props.title || 'Add Detail';
 
@@ -19,12 +21,13 @@ export default function CountryLanguageModal(props) {
     const modal = new Modal(modalRef.current, { keyboard: false });
     setModal(modal);
     modal.show();
-  }, [])
+  }, []);
+
   useEffect(() => {
-    service.getLangageDetailForCountry(props.country, props.language).then((detail) => {
-      setDetail(detail);
+    service.getLangageDetailForCountry(country, language).then((detail) => {
+      setExisting(detail);
     });
-  }, [ props.country, props.language ])
+  }, [ country, language ]);
 
   function handleClose(e) {
     modal.hide();
@@ -33,37 +36,6 @@ export default function CountryLanguageModal(props) {
     }
   }
 
-  function handleSave(e) {
-    let modal = e.target.closest('.modal');
-    let input = {
-      language_percentage: parseFloat(modal.querySelector('#language_percentage').value) || null,
-      is_official: modal.querySelector('#is_official').checked || false
-    };
-    console.log(`${ TAG }.handleSave(${ country },${ language }): Saving... ${ JSON.stringify(input) }...`);
-
-    if (props.country) {
-      service.updateLanguageDetailForCountry(country, language, input).then((res) => {
-        if (res.code === 200) {
-          if (props.onSave) {
-            props.onSave(res, e);
-          }
-        }
-        handleClose(e);
-      });
-    }
-    else {
-      input = { ...input, language_code: language };
-      service.addLanguageDetailForCountry(country, input).then((res) => {
-        if (res.code === 200) {
-          if (props.onSave) {
-            props.onSave(res, e);
-          }
-        }
-        handleClose(e);
-      });
-    }
-  }
-  
   function handleCountryChange(country, e) {
     console.log(`${ TAG }.handleCountryChange(${ country })`);
     if (country) {
@@ -78,6 +50,21 @@ export default function CountryLanguageModal(props) {
     }
   }
 
+  function handleSave(e) {
+    if (props.onSave) {
+      let modal = e.target.closest('.modal');
+      let input = {
+        language_percentage: parseFloat(modal.querySelector('#language_percentage').value) || null,
+        is_official: modal.querySelector('#is_official').checked || false
+      };
+      props.onSave(country, language, input, existing, e).then((result) => {
+        handleClose(e);
+      });
+      return;
+    }
+    handleClose(e);
+  }
+  
   return(
     <div className="py-2">
       <div className="modal" tabIndex="-1" ref={ modalRef }>
@@ -91,18 +78,18 @@ export default function CountryLanguageModal(props) {
               <div className="form-row">
                 <div className="mb-3">
                   <label htmlFor="languge_code">Language:</label>
-                  <LanguageSelect id="languge_code" disabled={ ((language) && (language !== '')) } language={ language } onChange={ handleLanguageChange } />
+                  <LanguageSelect id="languge_code" exclude={ languages } disabled={ ((props.language) && (props.language !== '')) } language={ language } onChange={ handleLanguageChange } />
                 </div>
                 <div className="mb-3">
                   <label htmlFor="country_code">Country:</label>
-                  <CountrySelect id="country_code" disabled={ ((country) && (country !== ''))} country={ country } onChange={ handleCountryChange } />
+                  <CountrySelect id="country_code" exclude={ countries } disabled={ ((props.country) && (props.country !== ''))} country={ country } onChange={ handleCountryChange } />
                 </div>
                 <div className="mb-3">
                   <label htmlFor="language_percentage" className="form-label">Percentage:</label>
-                  <input type="number" className="form-control" min="0" max="100" step="0.1" id="language_percentage" defaultValue={ detail?.language_percentage } />
+                  <input type="number" className="form-control" min="0" max="100" step="0.1" id="language_percentage" defaultValue={ existing?.language_percentage } />
                 </div>
                 <div className="mb-3 form-check">
-                  <input id="is_official" type="checkbox" className="form-check-input" defaultChecked={ detail?.is_official } />
+                  <input id="is_official" type="checkbox" className="form-check-input" defaultChecked={ existing?.is_official } />
                   <label className="form-check-label" htmlFor="is_official">Is Official</label>
                 </div>
               </div>
