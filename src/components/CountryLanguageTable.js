@@ -18,7 +18,7 @@ export default function CountryLanguageTable(props) {
     const country = e.target.dataset.countryCode;
     if ((country) && (props.onDelete)) {
       console.log(`${ TAG }.handleOnDelete(${ country })`);
-      props.onDelete(country, e);
+      props.onDelete(country, language, e);
     }
   }
 
@@ -27,7 +27,7 @@ export default function CountryLanguageTable(props) {
     if ((country) && (props.onEdit)) {
       console.log(`${ TAG }.handleOnEdit(${ country })`);
       service.getLangageDetailForCountry(country, language).then((detail) => {
-        props.onEdit(country, detail, e);
+        props.onEdit(country, language, detail, e);
       });
     }
   }

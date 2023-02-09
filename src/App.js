@@ -26,21 +26,21 @@ export default function App(props) {
     setLanguage(language);
   }
 
-  function handleCountryDelete(country, e) {
-    console.log(`${ TAG }.handleCountryDelete(${ JSON.stringify(country) })`);
+  function handleCountryDelete(country, language, e) {
+    console.log(`${ TAG }.handleCountryDelete(${ JSON.stringify(country) },${ JSON.stringify(language) })`);
     service.deleteLanguageDetailFromCountry(country, language).then((response) => {
       forceUpdate();
     });
   }
-  function handleCountryEdit(country, detail, e) {
-    console.log(`${ TAG }.handleCountryEdit(${ JSON.stringify(country) },${ JSON.stringify(detail) })`);
+  function handleCountryEdit(country, language, detail, e) {
+    console.log(`${ TAG }.handleCountryEdit(${ JSON.stringify(country) },${ JSON.stringify(language) },${ JSON.stringify(detail) })`);
     setModal(<CountryLanguageModal language={ language } country={ country }
                                    countries={ countries.map((c) => c.country_code) }
                                    onSave={ handleModalSave }
                                    onClose={ handleModalClose } />);
   }
-  function handleCountryAdd(response, e) {
-    console.log(`${ TAG }.handleCountryAdd(${ JSON.stringify(response) })`);
+  function handleCountryAdd(language, countries, e) {
+    //console.log(`${ TAG }.handleCountryAdd(${ JSON.stringify(language) },${ JSON.stringify(countries) })`);
     setModal(<CountryLanguageModal language={ language } country={ '' }
                                    countries={ countries.map((c) => c.country_code) }
                                    onSave={ handleModalSave }
