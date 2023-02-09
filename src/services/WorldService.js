@@ -90,6 +90,7 @@ export default class WorldService {
                         return {
                           //country_code: country,
                           language_code: c.language.language_code,
+						  language_name: c.language.language_name,
                           is_official: c.is_official,
                           language_percentage: c.language_percentage
                         };
