@@ -26,7 +26,7 @@ export default class WorldService {
     }
 
     const url = `${ this.url }/languages/${ language }/countries`;
-    console.log(`Requesting data from: ${ url }...`);
+    console.info(`Requesting data from: ${ url }...`);
     return fetch(url).then(res => res.json())
                      .then((json) => {
                        return json.map(c => {
@@ -50,7 +50,7 @@ export default class WorldService {
     }
 
     const url = `${ this.url }/languages`;
-    console.log(`Requesting data from: ${ url }...`);
+    console.info(`Requesting data from: ${ url }...`);
     return fetch(url).then(res => res.json())
                      .then((json) => {
                       this.#languages = json;
@@ -68,7 +68,7 @@ export default class WorldService {
     }
 
     const url = `${ this.url }/countries`;
-    console.log(`Requesting data from: ${ url }...`);
+    console.info(`Requesting data from: ${ url }...`);
     return fetch(url).then(res => res.json())
                      .then((json) => {
                        this.#countries = json;
@@ -77,25 +77,83 @@ export default class WorldService {
   }
 
   /**
+   * Retrieves the country with the specified identifier.
+   * @param {String} country The unique id of the country.
+   * @returns {Country} The country if found.
+   */
+  async getCountry(country) {
+    return this.getCountries().then((countries) => {
+      return countries.find((c) => c.country_code === country);
+    });
+  }
+
+  /**
    * Retrieves the language details spoken for the specified country.
    * @param {String} country The unique id of the country.
    * @returns {Array.Language} The list of spoken languages.
    */
   async getLanguagesSpokenInCountry(country) {
-    const url = `${ this.url }/countries/${country}/languages`;
-    console.log(`Requesting data from: ${ url }...`);
-    return fetch(url).then(res => res.json())
-                     .then((json) => {
-                      return json.map(c => {
-                        return {
-                          //country_code: country,
-                          language_code: c.language.language_code,
-						  language_name: c.language.language_name,
-                          is_official: c.is_official,
-                          language_percentage: c.language_percentage
-                        };
+    if (country) {
+      const url = `${ this.url }/countries/${country}/languages`;
+      console.info(`Requesting data from: ${ url }...`);
+      return fetch(url).then(res => res.json())
+                       .then((json) => {
+                        return json.map(c => {
+                          return {
+                            //country_code: country,
+                            language_code: c.language.language_code,
+                            language_name: c.language.language_name,
+                            is_official: c.is_official,
+                            language_percentage: c.language_percentage
+                          };
+                         });
                        });
-                     });
+    }
+  }
+
+  /**
+   * Retrieves the cities located or a member of the specified country.
+   * @param {String} country The unique id of the country.
+   * @returns {Array.City} The list of cities.
+   */
+  async getCitiesForCountry(country) {
+    if (country) {
+      const url = `${ this.url }/countries/${country}/cities`;
+      console.info(`Requesting data from: ${ url }...`);
+      return fetch(url).then(res => {
+                         if (res.status === 200) {
+                           return res.json()
+                         }
+                         return [];
+                       })
+                       .then((json) => {
+                         return json.map(c => {
+                          let { country, ...city } = c;
+                          return city;
+                         });
+                       });
+    }
+  }
+
+  /**
+   * Retrieves the city by it's unique identifier.
+   * @param {Number} city_id The unique id of the city.
+   * @returns {City} The city if found, otherwise null.
+   */
+  async getCity(city_id) {
+    if (city_id) {
+      const url = `${ this.url }/cities/${city_id}`;
+      console.info(`Requesting data from: ${ url }...`);
+      return fetch(url).then(res => {
+                         if (res.status === 200) {
+                           return res.json()
+                         }
+                         return null;
+                       })
+                       .then((json) => {
+                         return json;
+                       });
+    }
   }
 
   /**
@@ -128,7 +186,7 @@ export default class WorldService {
     }
 
     const url = `${ this.url }/countries/${ country }/languages`;
-    console.log(`POSTing data to: ${ url }... Content: ${ JSON.stringify(input) }`);
+    console.info(`POSTing data to: ${ url }... Content: ${ JSON.stringify(input) }`);
     return fetch(url, {
       method: 'POST',
       headers: {
@@ -157,7 +215,7 @@ export default class WorldService {
     }
 
     const url = `${ this.url }/countries/${ country }/languages/${ language }`;
-    console.log(`PUTing data to: ${ url }... Content: ${ JSON.stringify(input) }`);
+    console.info(`PUTing data to: ${ url }... Content: ${ JSON.stringify(input) }`);
     return fetch(url, {
       method: 'PUT',
       headers: {
@@ -185,7 +243,7 @@ export default class WorldService {
     }
 
     const url = `${ this.url }/countries/${ country }/languages/${ language }`;
-    console.log(`DELETEing data from: ${ url }...`);
+    console.info(`DELETEing data from: ${ url }...`);
     return fetch(url, {
       method: 'DELETE',
       headers: {
