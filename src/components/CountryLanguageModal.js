@@ -43,7 +43,7 @@ export default function CountryLanguageModal(props) {
     }
   }
 
-  function handleLanguageChange(handleLanguageChange, e) {
+  function handleLanguageChange(language, e) {
     console.log(`${ TAG }.handleLanguagehange(${ language })`);
     if (language) {
       setLanguage(language);
